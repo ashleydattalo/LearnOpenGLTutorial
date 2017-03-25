@@ -1,0 +1,2 @@
+/Users/ashleydattalo/graphics/LearnOpenGL/build/CMakeFiles/runThis.dir
+/Users/ashleydattalo/graphics/LearnOpenGL/build/CMakeFiles/run.dir
