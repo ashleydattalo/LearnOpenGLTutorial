@@ -11,8 +11,8 @@ public:
 
     void loadTexture();
     void setTarget(GLenum target);
-    void bind() const;
-    void unbind() const;
+    void bind();
+    void unbind();
     
 private:
     GLuint handle, target;

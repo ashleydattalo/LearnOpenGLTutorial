@@ -23,12 +23,12 @@ void Texture::setTarget(GLenum target) {
     this->target =  target;
 }
 
-void Texture::bind() const {
+void Texture::bind() {
     glActiveTexture(target);
     glBindTexture(GL_TEXTURE_2D, handle);
 }
 
-void Texture::unbind() const {
+void Texture::unbind() {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
