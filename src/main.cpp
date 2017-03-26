@@ -149,36 +149,46 @@ int main()
 
     while (!glfwWindowShouldClose(window))
     {
+        // Calculate deltatime of current frame
         GLfloat currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame; 
+        lastFrame = currentFrame;
 
+        // Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
         glfwPollEvents();
         do_movement();
 
-        lightPos.x = sin(glfwGetTime());
-        lightPos.z = cos(glfwGetTime());
-
-
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        // Clear the colorbuffer
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 
         // Use cooresponding shader when setting uniforms/drawing objects
         lightingShader->use();
-        GLint objectColorLoc = glGetUniformLocation(lightingShader->getProg(), "objectColor");
-        GLint lightColorLoc  = glGetUniformLocation(lightingShader->getProg(), "lightColor");
-        GLint lightPosLoc  = glGetUniformLocation(lightingShader->getProg(), "lightPos");
-        GLint camPosLoc  = glGetUniformLocation(lightingShader->getProg(), "camPos");
-        glUniform3f(objectColorLoc, 1.0f, 0.5f, 0.31f);
-        glUniform3f(lightColorLoc, 1.0f, 0.5f, 1.0f);
-        glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
-        glm::vec3 camPos = camera.Position;
-        glUniform3f(camPosLoc, camPos.x, camPos.y, camPos.z);
+        GLint lightPosLoc    = glGetUniformLocation(lightingShader->getProg(), "light.position");
+        GLint viewPosLoc     = glGetUniformLocation(lightingShader->getProg(), "viewPos");
+        glUniform3f(lightPosLoc,    lightPos.x, lightPos.y, lightPos.z);
+        glUniform3f(viewPosLoc,     camera.Position.x, camera.Position.y, camera.Position.z);
+        // Set lights properties
+        glm::vec3 lightColor;
+        lightColor.x = sin(glfwGetTime() * 2.0f);
+        lightColor.y = sin(glfwGetTime() * 0.7f);
+        lightColor.z = sin(glfwGetTime() * 1.3f);
+        glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f); // Decrease the influence
+        glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // Low influence
+        glUniform3f(glGetUniformLocation(lightingShader->getProg(), "light.ambient"),  ambientColor.x, ambientColor.y, ambientColor.z);
+        glUniform3f(glGetUniformLocation(lightingShader->getProg(), "light.diffuse"),  diffuseColor.x, diffuseColor.y, diffuseColor.z);
+        glUniform3f(glGetUniformLocation(lightingShader->getProg(), "light.specular"), 1.0f, 1.0f, 1.0f);
+        // Set material properties
+        glUniform3f(glGetUniformLocation(lightingShader->getProg(), "material.ambient"),   1.0f, 0.5f, 0.31f);
+        glUniform3f(glGetUniformLocation(lightingShader->getProg(), "material.diffuse"),   1.0f, 0.5f, 0.31f);
+        glUniform3f(glGetUniformLocation(lightingShader->getProg(), "material.specular"),  0.5f, 0.5f, 0.5f); // Specular doesn't have full effect on this object's material
+        glUniform1f(glGetUniformLocation(lightingShader->getProg(), "material.shininess"), 32.0f);
 
         // Create camera transformations
         glm::mat4 view;
         view = camera.GetViewMatrix();
-        glm::mat4 projection = glm::perspective(45.0f, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
+        glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
         // Get the uniform locations
         GLint modelLoc = glGetUniformLocation(lightingShader->getProg(), "model");
         GLint viewLoc  = glGetUniformLocation(lightingShader->getProg(),  "view");
@@ -211,6 +221,7 @@ int main()
         glBindVertexArray(lightVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
+
 
         // Swap the screen buffers
         glfwSwapBuffers(window);
