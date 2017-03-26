@@ -9,8 +9,11 @@
 #include <glm/glm.hpp>
 
 #define SHADER_PATH "/Users/ashleydattalo/graphics/LearnOpenGL/src/Shaders/"
+#define RESOURCE_PATH "/Users/ashleydattalo/graphics/LearnOpenGL/resources/"
 
 #include "Shader.hpp"
+#include "Texture.hpp"
+
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode);
 
@@ -48,48 +51,27 @@ int main()
     glfwGetFramebufferSize(window, &width, &height);  
     glViewport(0, 0, width, height);
 
-    Shader *shader = new Shader(SHADER_PATH "default.vert", SHADER_PATH "default.frag");
+    // Shader *shader = new Shader(SHADER_PATH "default.vert", SHADER_PATH "default.frag");
+    Shader *shader = new Shader(SHADER_PATH "texture.vert", SHADER_PATH "texture.frag");
+    std::string texPath1 = "/Users/ashleydattalo/graphics/LearnOpenGL/resources/brickWall.jpg";
+    std::string texPath2 = "/Users/ashleydattalo/graphics/LearnOpenGL/resources/awesomeface.png";
+    Texture *texture1 = new Texture(texPath1);
+    texture1->loadTexture();
+    Texture *texture2 = new Texture(texPath2);
+    texture2->setTarget(GL_TEXTURE1);
+    texture2->loadTexture();
 
-    // GLfloat vertices[] = {
-    //      0.5f,  0.5f, 0.0f,  // Top Right
-    //      0.5f, -0.5f, 0.0f,  // Bottom Right
-    //     -0.5f, -0.5f, 0.0f,  // Bottom Left
-    //     -0.5f,  0.5f, 0.0f   // Top Left 
-    // };
     GLfloat vertices[] = {
-        // Positions         // Colors
-         0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // Bottom Right
-        -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // Bottom Left
-         0.0f, 0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // Top 
-    };    
+        // Positions          // Colors           // Texture Coords
+         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // Top Right
+         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // Bottom Right
+        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // Bottom Left
+        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // Top Left 
+    };   
     GLuint indices[] = {  // Note that we start from 0!
-        0, 1, 2  // First Triangle
-        // 1, 2, 3   // Second Triangle
+        0, 1, 3,  // First Triangle
+        1, 2, 3   // Second Triangle
     };
-
-    std::vector<GLfloat> verticesVec;
-        verticesVec.push_back(0.5f);
-        verticesVec.push_back(0.5f);
-        verticesVec.push_back(0.0f);
-        
-        verticesVec.push_back(0.5f);
-        verticesVec.push_back(-0.5f);
-        verticesVec.push_back(0.0f);
-
-        verticesVec.push_back(-0.5f);
-        verticesVec.push_back(-0.5f);
-        verticesVec.push_back(0.0f);
-
-        verticesVec.push_back(-0.5f);
-        verticesVec.push_back(0.5f);
-        verticesVec.push_back(0.0f);
-
-    // std::cout << sizeof(vertices) << std::endl;
-    // std::cout << sizeof(verticesVec) << std::endl;
-
-    // for (int i = 0 ; i < 12; i++) {
-    //     std::cout << vertices[i] << "  " << verticesVec[i] << std::endl;
-    // }
 
     GLuint VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
@@ -105,11 +87,14 @@ int main()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // Position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
     glEnableVertexAttribArray(0);
     // Color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3* sizeof(GLfloat)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3* sizeof(GLfloat)));
     glEnableVertexAttribArray(1);
+    // TexCoord attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6* sizeof(GLfloat)));
+    glEnableVertexAttribArray(2);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as the currently bound vertex buffer object so afterwards we can safely unbind
 
@@ -126,8 +111,11 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        texture1->bind();
+        texture2->bind();
+
         shader->use();
-        glUniform1f(glGetUniformLocation(shader->getProg(), "offset"), 0.0f);
+        // glUniform1f(glGetUniformLocation(shader->getProg(), "offset"), 0.0f);
         // // Update the uniform color
         // GLfloat timeValue = glfwGetTime();
         // GLfloat greenValue = (glm::sin(timeValue) / 2) + 0.5;

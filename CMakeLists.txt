@@ -4,9 +4,11 @@ project(runThis)
 set(SOURCES
     src/main.cpp
     src/Shader.cpp
+    src/Texture.cpp
 )
 set(HEADERS
     src/Shader.hpp
+    src/Texture.hpp
 )
 set(SHADERS
 )
