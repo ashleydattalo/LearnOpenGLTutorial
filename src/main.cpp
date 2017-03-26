@@ -7,6 +7,8 @@
 #include <vector>
 
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #define SHADER_PATH "/Users/ashleydattalo/graphics/LearnOpenGL/src/Shaders/"
 #define RESOURCE_PATH "/Users/ashleydattalo/graphics/LearnOpenGL/resources/"
@@ -51,15 +53,12 @@ int main()
     glfwGetFramebufferSize(window, &width, &height);  
     glViewport(0, 0, width, height);
 
-    // Shader *shader = new Shader(SHADER_PATH "default.vert", SHADER_PATH "default.frag");
-    Shader *shader = new Shader(SHADER_PATH "texture.vert", SHADER_PATH "texture.frag");
+    Shader *shader = new Shader(SHADER_PATH "default.vert", SHADER_PATH "default.frag");
+    // Shader *shader = new Shader(SHADER_PATH "texture.vert", SHADER_PATH "texture.frag");
     std::string texPath1 = "/Users/ashleydattalo/graphics/LearnOpenGL/resources/brickWall.jpg";
     std::string texPath2 = "/Users/ashleydattalo/graphics/LearnOpenGL/resources/awesomeface.png";
-    Texture *texture1 = new Texture(texPath1);
-    texture1->loadTexture();
-    Texture *texture2 = new Texture(texPath2);
-    texture2->setTarget(GL_TEXTURE1);
-    texture2->loadTexture();
+    // Texture *texture1 = new Texture(texPath1);
+    // texture1->loadTexture();
 
     GLfloat vertices[] = {
         // Positions          // Colors           // Texture Coords
@@ -111,11 +110,15 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        texture1->bind();
-        texture2->bind();
+        // texture1->bind();
+        glm::mat4 transform;
+        transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
+        transform = glm::rotate(transform,(GLfloat)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+        // transform = glm::scale(transform, glm::vec3(2.0f));  
 
         shader->use();
-        // glUniform1f(glGetUniformLocation(shader->getProg(), "offset"), 0.0f);
+        GLuint transformLoc = glGetUniformLocation(shader->getProg(), "transform");
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
         // // Update the uniform color
         // GLfloat timeValue = glfwGetTime();
         // GLfloat greenValue = (glm::sin(timeValue) / 2) + 0.5;
