@@ -9,6 +9,7 @@ set(SOURCES
 set(HEADERS
     src/Shader.hpp
     src/Texture.hpp
+    src/Camera.hpp
 )
 set(SHADERS
 )
