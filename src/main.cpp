@@ -119,6 +119,18 @@ int main()
         -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
         -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
     };
+    glm::vec3 cubePositions[] = {
+        glm::vec3( 0.0f,  0.0f,  0.0f),
+        glm::vec3( 2.0f,  5.0f, -15.0f),
+        glm::vec3(-1.5f, -2.2f, -2.5f),
+        glm::vec3(-3.8f, -2.0f, -12.3f),
+        glm::vec3( 2.4f, -0.4f, -3.5f),
+        glm::vec3(-1.7f,  3.0f, -7.5f),
+        glm::vec3( 1.3f, -2.0f, -2.5f),
+        glm::vec3( 1.5f,  2.0f, -2.5f),
+        glm::vec3( 1.5f,  0.2f, -1.5f),
+        glm::vec3(-1.3f,  1.0f, -1.5f)
+    };
     // First, set the container's VAO (and VBO)
     GLuint VBO, containerVAO;
     glGenVertexArrays(1, &containerVAO);
@@ -168,12 +180,13 @@ int main()
         GLint lightPosLoc    = glGetUniformLocation(lightingShader->getProg(), "light.position");
         GLint viewPosLoc     = glGetUniformLocation(lightingShader->getProg(), "viewPos");
         glUniform3f(lightPosLoc,    lightPos.x, lightPos.y, lightPos.z);
+        // glUniform3f(lightPosLoc,     camera.Position.x, camera.Position.y, camera.Position.z);
         glUniform3f(viewPosLoc,     camera.Position.x, camera.Position.y, camera.Position.z);
         // Set lights properties
-        glm::vec3 lightColor;
-        lightColor.x = sin(glfwGetTime() * 2.0f);
-        lightColor.y = sin(glfwGetTime() * 0.7f);
-        lightColor.z = sin(glfwGetTime() * 1.3f);
+        glm::vec3 lightColor = glm::vec3(1.0f);
+        // lightColor.x = sin(glfwGetTime() * 2.0f);
+        // lightColor.y = sin(glfwGetTime() * 0.7f);
+        // lightColor.z = sin(glfwGetTime() * 1.3f);
         glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f); // Decrease the influence
         glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // Low influence
         glUniform3f(glGetUniformLocation(lightingShader->getProg(), "light.ambient"),  ambientColor.x, ambientColor.y, ambientColor.z);
@@ -184,6 +197,13 @@ int main()
         glUniform3f(glGetUniformLocation(lightingShader->getProg(), "material.diffuse"),   1.0f, 0.5f, 0.31f);
         glUniform3f(glGetUniformLocation(lightingShader->getProg(), "material.specular"),  0.5f, 0.5f, 0.5f); // Specular doesn't have full effect on this object's material
         glUniform1f(glGetUniformLocation(lightingShader->getProg(), "material.shininess"), 32.0f);
+
+        GLint lightDirPos = glGetUniformLocation(lightingShader->getProg(), "light.direction");
+        glUniform3f(lightDirPos, -0.2f, -1.0f, -0.3f);  
+
+        glUniform1f(glGetUniformLocation(lightingShader->getProg(), "light.constant"),  1.0f);
+        glUniform1f(glGetUniformLocation(lightingShader->getProg(), "light.linear"),    0.09);
+        glUniform1f(glGetUniformLocation(lightingShader->getProg(), "light.quadratic"), 0.032);
 
         // Create camera transformations
         glm::mat4 view;
@@ -197,12 +217,27 @@ int main()
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
-        // Draw the container (using container's vertex attributes)
-        glBindVertexArray(containerVAO);
+
         glm::mat4 model;
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(containerVAO);
+        for (GLuint i = 0; i < 10; i++)
+        {
+            model = glm::mat4();
+            model = glm::translate(model, cubePositions[i]);
+            GLfloat angle = 20.0f * i;
+            model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
+            glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
         glBindVertexArray(0);
+
+        // // Draw the container (using container's vertex attributes)
+        // glBindVertexArray(containerVAO);
+        // glm::mat4 model;
+        // glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        // glDrawArrays(GL_TRIANGLES, 0, 36);
+        // glBindVertexArray(0);
 
         // Also draw the lamp object, again binding the appropriate shader
         lampShader->use();
