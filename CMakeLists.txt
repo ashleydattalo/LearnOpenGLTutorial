@@ -5,11 +5,15 @@ set(SOURCES
     src/main.cpp
     src/Shader.cpp
     src/Texture.cpp
+    src/Particles/ParticleSystem.cpp
+    src/Particles/Particle.cpp
 )
 set(HEADERS
     src/Shader.hpp
     src/Texture.hpp
     src/Camera.hpp
+    src/Particles/ParticleSystem.hpp
+    src/Particles/Particle.hpp
 )
 set(SHADERS
 )
@@ -17,7 +21,7 @@ set(RESOURCES
 )
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-foreach(FOLDERNAME IN ITEMS "Components" "Graphics" "imgui" "Input" "QuadTree" "rapidjson" "Renderers")
+foreach(FOLDERNAME IN ITEMS "Particles" "Graphics" "imgui" "Input" "QuadTree" "rapidjson" "Renderers")
     string(CONCAT FILEREGEX "src/" ${FOLDERNAME} "/.*")
 
     source_group("Source Files\\${FOLDERNAME}" REGULAR_EXPRESSION "${FILEREGEX}\\.cpp")
