@@ -106,7 +106,7 @@ glm::vec3 genPos() {
 }
 
 void ParticleSystem::createParticles() {
-    static float color = .4;
+    static float color = 0;
     float inc = 1.0f / nParticles;
     for (int i = 1; i <= nParticles; i++) {
         Particle *p = new Particle(i, origin, particleType);
@@ -115,7 +115,7 @@ void ParticleSystem::createParticles() {
         glm::vec3 col = glm::vec3(.3, .2, color);
         glm::vec3 pos = glm::vec3(randNum(-1.0f, 1.0f), randNum(-35.0f,-15.0f), randNum(0.5f, 1.0f));
         float scale = 20 * color;
-        float t = 50 * color;
+        float t = 40 * color;
         float alpha = 1;
 
         // col = glm::vec3(1.0f);
