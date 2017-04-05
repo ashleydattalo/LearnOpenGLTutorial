@@ -1,6 +1,9 @@
 #include "Particle.hpp"
 
 #include <glm/gtx/string_cast.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 #include <iostream>
 #include <string>
 
@@ -33,25 +36,34 @@ void Particle::init() {
 
 void Particle::rebirth(float dt) {
     mass = 10.0f;
-    lifespan = 5.0f;
+    lifespan = 2.0f;
     tEnd = t + lifespan;
 }
 
 void Particle::update(float dt) {
-    t += .01;
+    static float angle = 0;
+    t += dt * .06;
+    // t *= .01;
     if (t > tEnd) {
         rebirth(t);
     }
+    alpha = (tEnd-t)/lifespan;
+    std::cout << alpha << std::endl;
     float radius = 3;
     float period = 1.5;
 
-    radius = glm::cos(t * period) + sin(t* period);
-    position.x = radius * glm::cos(t);
-    position.y = radius * glm::sin(t);
-    position.z = radius;
-
-    // position *= .1;
+    radius = glm::sin(t * period);
+    position.x = radius * glm::cos(t * period);
+    position.y = fmod(t, 360)/4;
+    position.z = radius * glm::sin(t * period);
     // position += glm::vec3(origin.x, origin.y, origin.z);
+
+    glm::mat4 transform;
+    glm::vec3 rotationAxis(1.0f, 0.0f, 0.0f);
+
+    transform = glm::translate(transform, glm::vec3(position.x, position.x, position.z));
+    transform = glm::rotate(transform, 30.0f, rotationAxis);
+    position = glm::vec3(transform * glm::vec4(position, 1.0f));
 }
 
 

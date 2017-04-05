@@ -10,7 +10,7 @@ void main()
 {
     vec2 cord = 2.0 * gl_PointCoord - 1.0;
     if (dot(cord, cord) <= 1.0f) {
-        color = vecCol;
+        color = vec4(vecPos.xyz, vecCol.w);
     }
     else {
         color = vec4(1.0f, 1.0f, 1.0f, 0.0f);

@@ -4,6 +4,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/transform.hpp>
 
 #define GLEW_STATIC
 #include <GL/glew.h>
@@ -20,7 +21,7 @@ ParticleSystem::ParticleSystem()
 {
 	origin = glm::vec3(0.0f, 0.0f, 0.0f);
 	particleType = "general";
-	nParticles = 500;
+	nParticles = 3000;
     id = numPSys++;
     init();
 }
