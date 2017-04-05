@@ -23,6 +23,7 @@ public:
 	void setColor(glm::vec3 col);
 	void setScale(float sca);
 	void setAlpha(float alp);
+	void setT(float t);
 
 	void updatePosition(glm::vec3 update);
 	int getIndex();
@@ -50,6 +51,8 @@ private:
 	float mass;
 	float lifespan;
 	float tEnd;
+
+	bool alphaToggle;
 };
 
 #endif

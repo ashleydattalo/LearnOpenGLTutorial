@@ -15,6 +15,11 @@ Particle::Particle() {
 
 Particle::Particle(int index, glm::vec3 origin, std::string type) :
     index(index), origin(origin), type(type) {
+        color = glm::vec3(randFloat(0.5f, 1.0f), randFloat(0.5f, 1.0f), randFloat(0.5f, 1.0f));
+        position = glm::vec3(randFloat(-1.0f, 1.0f), randFloat(-1.0f, 1.0f), randFloat(0.5f, 1.0f));
+        scale = randFloat(1, 10);
+        t = randFloat(-10, 10);
+        alpha = 1.0f;
         init();
     }
 
@@ -26,11 +31,7 @@ Particle::Particle(glm::vec3 position, glm::vec3 color, float scale, float alpha
 Particle::~Particle() {}
 
 void Particle::init() {
-    color = glm::vec3(randFloat(0.5f, 1.0f), randFloat(0.5f, 1.0f), randFloat(0.5f, 1.0f));
-    position = glm::vec3(randFloat(-1.0f, 1.0f), randFloat(-1.0f, 1.0f), randFloat(0.5f, 1.0f));
-    scale = randFloat(1, 5);
-    alpha = 1.0f;
-    t = randFloat(-10, 10);
+    alphaToggle = false;
     rebirth(t);
 }
 
@@ -38,6 +39,7 @@ void Particle::rebirth(float dt) {
     mass = 10.0f;
     lifespan = 2.0f;
     tEnd = t + lifespan;
+    alphaToggle = !alphaToggle;
 }
 
 void Particle::update(float dt) {
@@ -47,12 +49,22 @@ void Particle::update(float dt) {
     if (t > tEnd) {
         rebirth(t);
     }
-    alpha = (tEnd-t)/lifespan;
-    std::cout << alpha << std::endl;
-    float radius = 3;
-    float period = 1.5;
 
-    radius = glm::sin(t * period);
+    if (alphaToggle) {
+        alpha = (tEnd-t)/lifespan;
+    }
+    else {
+        alpha = 1-(tEnd-t)/lifespan;
+    }
+    // if (index == 1) {
+    //     std::cout << t << std::endl;
+    // }
+    float radius = 3;
+
+
+    static float period = 1;
+
+    radius = (glm::sin(t) + glm::cos(t)) * t * .5;
     position.x = radius * glm::cos(t * period);
     position.y = fmod(t, 360)/4;
     position.z = radius * glm::sin(t * period);
@@ -62,7 +74,7 @@ void Particle::update(float dt) {
     glm::vec3 rotationAxis(1.0f, 0.0f, 0.0f);
 
     transform = glm::translate(transform, glm::vec3(position.x, position.x, position.z));
-    transform = glm::rotate(transform, 30.0f, rotationAxis);
+    // transform = glm::rotate(transform, 30.0f, rotationAxis);
     position = glm::vec3(transform * glm::vec4(position, 1.0f));
 }
 
@@ -91,6 +103,9 @@ void Particle::setScale(float sca) {
 }
 void Particle::setAlpha(float alp) {
     this->alpha = alp;
+}
+void Particle::setT(float t) {
+    this->t = t;
 }
 
 

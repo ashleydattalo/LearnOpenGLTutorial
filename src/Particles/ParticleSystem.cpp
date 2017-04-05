@@ -19,9 +19,9 @@
 static int numPSys = 0;
 ParticleSystem::ParticleSystem()
 {
-	origin = glm::vec3(0.0f, 0.0f, 0.0f);
-	particleType = "general";
-	nParticles = 3000;
+    origin = glm::vec3(0.0f, 0.0f, 0.0f);
+    particleType = "general";
+    nParticles = 6000;
     id = numPSys++;
     init();
 }
@@ -54,7 +54,7 @@ void ParticleSystem::update(float dt) {
 }
 
 void ParticleSystem::render(const glm::mat4 &projection, const glm::mat4 &view) {
-	glEnable(GL_BLEND);
+    glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // glDisable(GL_DEPTH_TEST);
 
@@ -106,19 +106,27 @@ glm::vec3 genPos() {
 }
 
 void ParticleSystem::createParticles() {
-	for (int i = 0; i < nParticles; i++) {
+    static float color = .4;
+    float inc = 1.0f / nParticles;
+    for (int i = 1; i <= nParticles; i++) {
         Particle *p = new Particle(i, origin, particleType);
-        glm::vec3 col = glm::vec3(randNum(0.5f, 1.0f), randNum(0.5f, 1.0f), randNum(0.5f, 1.0f));
-        glm::vec3 pos = glm::vec3(randNum(-1.0f, 1.0f), randNum(-1.0f, 1.0f), randNum(0.5f, 1.0f));
-        // glm::vec3 pos = genPos();
-        float scale = 10;
+        color += inc;
+        std::cout << i << " " << color << std::endl;
+        glm::vec3 col = glm::vec3(.3, .2, color);
+        glm::vec3 pos = glm::vec3(randNum(-1.0f, 1.0f), randNum(-35.0f,-15.0f), randNum(0.5f, 1.0f));
+        float scale = 20 * color;
+        float t = 50 * color;
         float alpha = 1;
+
+        // col = glm::vec3(1.0f);
+        // scale = 15;
+        // alpha = 1;
 
         p->setPosition(pos);
         p->setColor(col);
         p->setScale(scale);
         p->setAlpha(alpha);
-
+        p->setT(t);
 
         particles.push_back(p);
         updateGLData(p);
@@ -126,7 +134,7 @@ void ParticleSystem::createParticles() {
 }
 
 void ParticleSystem::createShader() {
-	shader = new Shader(SHADER_PATH "particles.vert", SHADER_PATH "general.frag");
+    shader = new Shader(SHADER_PATH "particles.vert", SHADER_PATH "general.frag");
 }
 
 void ParticleSystem::createGLBuffers() {
@@ -175,7 +183,7 @@ void ParticleSystem::createGLBuffers() {
 }
 
 void ParticleSystem::updateGLData(Particle *p) {
-	int index = p->getIndex();
+    int index = p->getIndex();
     glm::vec3 col = p->getColor();
     glm::vec3 pos = p->getPosition();
 

@@ -213,7 +213,7 @@ int main()
         // Create camera transformations
         glm::mat4 view;
         view = camera.GetViewMatrix();
-        glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
+        glm::mat4 projection = glm::perspective(camera.Zoom + 20.0f, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 200.0f);
         // Get the uniform locations
         
         // GLint modelLoc = glGetUniformLocation(lightingShader->getProg(), "model");
@@ -295,6 +295,8 @@ void do_movement() {
         camera.ProcessKeyboard(LEFT, deltaTime);
     if(keys[GLFW_KEY_D])
         camera.ProcessKeyboard(RIGHT, deltaTime);
+    if(keys[GLFW_KEY_J])
+        camera.ProcessKeyboard(SPEEDUP, deltaTime);
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos){
