@@ -48,10 +48,14 @@ private:
     std::vector<float> colBuf;
     std::vector<float> alpBuf;
     std::vector<float> scaBuf;
+    std::vector<float> radBuf;
+    std::vector<float> initTimeBuf;
     GLuint posBufID;
     GLuint colBufID;
     GLuint alpBufID;
     GLuint scaBufID;
+    GLuint radBufID;
+    GLuint initTimeBufID;
 
     Shader *shader;
 

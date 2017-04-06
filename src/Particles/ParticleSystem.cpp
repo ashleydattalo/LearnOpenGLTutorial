@@ -17,7 +17,7 @@
 
 #define SHADER_PATH "/Users/ashleydattalo/graphics/LearnOpenGL/src/Shaders/"
 
-#define HEIGHT 8
+#define HEIGHT 100
 
 static int numPSys = 0;
 float currTime = 0;
@@ -25,7 +25,7 @@ ParticleSystem::ParticleSystem()
 {
     origin = glm::vec3(0.0f, 0.0f, 0.0f);
     particleType = "general";
-    nParticles = 6000;
+    nParticles = 7000;
     id = numPSys++;
     init();
 }
@@ -45,8 +45,11 @@ void ParticleSystem::init() {
     alpBuf.resize(nParticles);
     scaBuf.resize(nParticles);
 
-    createGLBuffers();
+    radBuf.resize(nParticles);
+    initTimeBuf.resize(nParticles);
+
     createParticles();
+    createGLBuffers();
     createShader();
 }
 float ParticleSystem::getR(float percent) {
@@ -112,7 +115,7 @@ void ParticleSystem::setRainbow() {
     // for (int i = 1; i <= max; i++) {
     //     //step = step + percentage;
     // }
-    std::cout << std::endl;
+    // std::cout << std::endl;
     for (Particle *p : particles) {
         glm::vec3 pos = p->getPosition();
         float percentage = getPercentage(pos.y);
@@ -129,10 +132,10 @@ void ParticleSystem::setRainbow() {
 }
 
 void ParticleSystem::update(float dt) {
-    setRainbow();
+    // setRainbow();
     for (Particle *p : particles) {
         p->update(dt);
-        updateGLData(p);
+        // updateGLData(p);
     }
 }
 
@@ -147,8 +150,9 @@ void ParticleSystem::render(const glm::mat4 &projection, const glm::mat4 &view) 
 
     currTime = fmod(glfwGetTime(), HEIGHT);
 
+    std::cout << glfwGetTime()/10 << std::endl;
     GLint timeLoc = glGetUniformLocation(shader->getProg(), "time");
-    glUniform1f(timeLoc, glfwGetTime());
+    glUniform1f(timeLoc, glfwGetTime()/10);
 
     GLint projLoc = glGetUniformLocation(shader->getProg(), "P");
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
@@ -156,12 +160,12 @@ void ParticleSystem::render(const glm::mat4 &projection, const glm::mat4 &view) 
     GLint viewLoc = glGetUniformLocation(shader->getProg(), "V");
     glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
-    //send pos data to gpu
-    glBindBuffer(GL_ARRAY_BUFFER, posBufID);
-    glBufferData(GL_ARRAY_BUFFER, posBuf.size()*sizeof(float), &posBuf[0], GL_STREAM_DRAW);
+    // //send pos data to gpu
+    // glBindBuffer(GL_ARRAY_BUFFER, posBufID);
+    // glBufferData(GL_ARRAY_BUFFER, posBuf.size()*sizeof(float), &posBuf[0], GL_STREAM_DRAW);
 
-    glBindBuffer(GL_ARRAY_BUFFER, alpBufID);
-    glBufferData(GL_ARRAY_BUFFER, alpBuf.size()*sizeof(float), &alpBuf[0], GL_STREAM_DRAW);
+    // glBindBuffer(GL_ARRAY_BUFFER, alpBufID);
+    // glBufferData(GL_ARRAY_BUFFER, alpBuf.size()*sizeof(float), &alpBuf[0], GL_STREAM_DRAW);
 
     // //send color data to gpu
     // glBindBuffer(GL_ARRAY_BUFFER, colBufID);
@@ -194,11 +198,21 @@ void ParticleSystem::createParticles() {
     for (int i = 1; i <= nParticles; i++) {
         Particle *p = new Particle(i, origin, particleType);
         color += inc;
-        glm::vec3 col = glm::vec3(.3, .2, color);
+        // glm::vec3 col = glm::vec3(.3, .2, color);
+        glm::vec3 col = rgbVal(color);
         // glm::vec3 pos = glm::vec3(randNum(-1.0f, 1.0f), randNum(-355.0f,-205.0f), randNum(0.5f, 1.0f));
         glm::vec3 pos = glm::vec3(randNum(-1.0f, 1.0f), HEIGHT*color, randNum(0.5f, 1.0f));
         float scale = 50 * color;
-        float t = 100 * color;
+        float t = 20*color;
+
+        float radius = color;
+        // pos.x = radius * sin(t);
+        // pos.y += radius * (t);
+        // pos.z = radius * cos(t);
+
+
+        radBuf[i] = radius;
+        initTimeBuf[i] = t;
 
         float alpha = 1;
 
@@ -225,13 +239,15 @@ void ParticleSystem::createGLBuffers() {
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_PROGRAM_POINT_SIZE);
     // glEnable(GL_POINT_SMOOTH);
-    GLuint bufs[4];
-    glGenBuffers(4, bufs);
+    GLuint bufs[6];
+    glGenBuffers(6, bufs);
     std::cout << "createGLBuffers" << std::endl;
     posBufID = bufs[0];
     colBufID = bufs[1];
     alpBufID = bufs[2];
     scaBufID = bufs[3];
+    radBufID = bufs[4];
+    initTimeBufID = bufs[5];
 
     glGenVertexArrays(1, &VAO);
     // Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
@@ -262,8 +278,21 @@ void ParticleSystem::createGLBuffers() {
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(GLfloat), (GLvoid*)0);
 
+    //radius
+    glBindBuffer(GL_ARRAY_BUFFER, radBufID);
+    glBufferData(GL_ARRAY_BUFFER, radBuf.size()*sizeof(float), &radBuf[0], GL_STREAM_DRAW);
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(GLfloat), (GLvoid*)0);
+
+    //initial time
+    glBindBuffer(GL_ARRAY_BUFFER, initTimeBufID);
+    glBufferData(GL_ARRAY_BUFFER, initTimeBuf.size()*sizeof(float), &initTimeBuf[0], GL_STREAM_DRAW);
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(5, 1, GL_FLOAT, GL_FALSE, sizeof(GLfloat), (GLvoid*)0);
+
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+    std::cout << "endBuf" << std::endl;
 }
 
 void ParticleSystem::updateGLData(Particle *p) {
@@ -293,6 +322,12 @@ void ParticleSystem::updateGLData(Particle *p) {
 
     glBindBuffer(GL_ARRAY_BUFFER, alpBufID);
     glBufferSubData(GL_ARRAY_BUFFER, index*sizeof(float), sizeof(float), &alpBuf[index]);
+
+    glBindBuffer(GL_ARRAY_BUFFER, radBufID);
+    glBufferSubData(GL_ARRAY_BUFFER, index*sizeof(float), sizeof(float), &radBuf[index]);
+
+    glBindBuffer(GL_ARRAY_BUFFER, initTimeBufID);
+    glBufferSubData(GL_ARRAY_BUFFER, index*sizeof(float), sizeof(float), &initTimeBuf[index]);
 }
 
 float ParticleSystem::randNum(float min, float max) {
