@@ -54,17 +54,21 @@ void Particle::update(float dt) {
         alpha = (tEnd-t)/lifespan;
     }
     else {
-        alpha = 1-(tEnd-t)/lifespan;
+        alpha = 1-((tEnd-t)/lifespan);
     }
-    // if (index == 1) {
-    //     std::cout << t << std::endl;
-    // }
+    // alpha *= percent;
+    if (index == 1) {
+        std::cout << alpha << std::endl;
+    }
     static float radius = 1;
     static float period = 1;
 
-    radius += (sin(t)*.01 + cos(t)*.01) * .01;
+    radius += (cos(10*t)) * .003;
+    radius += sin(10*t) * .003;
+    period = fmod(period, 100);
+    // radius = fmod(radius, 10);
     position.x = radius * glm::cos(t * period);
-    position.y = fmod(t, 360)/20;
+    position.y = fmod(t, 360)/10;
     position.z = radius * glm::sin(t * period);
     // position += glm::vec3(origin.x, origin.y, origin.z);
 
@@ -105,6 +109,9 @@ void Particle::setAlpha(float alp) {
 void Particle::setT(float t) {
     this->t = t;
 }
+void Particle::setPercent(float per) {
+    this->percent = per;
+}
 
 
 int Particle::getIndex() {
@@ -124,4 +131,8 @@ float Particle::getScale() {
 
 float Particle::getAlpha() {
     return this->alpha;
+}
+
+float Particle::getPercent() {
+    return this->percent;
 }

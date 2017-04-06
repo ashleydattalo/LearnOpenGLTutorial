@@ -21,7 +21,7 @@ ParticleSystem::ParticleSystem()
 {
     origin = glm::vec3(0.0f, 0.0f, 0.0f);
     particleType = "general";
-    nParticles = 6000;
+    nParticles = 8000;
     id = numPSys++;
     init();
 }
@@ -106,20 +106,21 @@ glm::vec3 genPos() {
 }
 
 void ParticleSystem::createParticles() {
-    static float color = 0;
+    static float percent = 0;
     float inc = 1.0f / nParticles;
     for (int i = 1; i <= nParticles; i++) {
         Particle *p = new Particle(i, origin, particleType);
-        color += inc;
-        std::cout << i << " " << color << std::endl;
-        glm::vec3 col = glm::vec3(.3, .2, color);
+        percent += inc;
+        std::cout << i << " " << percent << std::endl;
+        glm::vec3 col = glm::vec3(.3, .2, percent);
+        // glm::vec3 col = glm::vec3(1, .54, 0);
         glm::vec3 pos = glm::vec3(randNum(-1.0f, 1.0f), randNum(-35.0f,-15.0f), randNum(0.5f, 1.0f));
-        float scale = 20 * color;
-        float t = 40 * color;
+        float scale = 20 * percent;
+        float t = 15 + 60 * percent;
         float alpha = 1;
 
         // col = glm::vec3(1.0f);
-        // scale = 15;
+        // scale = 50;
         // alpha = 1;
 
         p->setPosition(pos);
@@ -127,6 +128,7 @@ void ParticleSystem::createParticles() {
         p->setScale(scale);
         p->setAlpha(alpha);
         p->setT(t);
+        p->setPercent(percent);
 
         particles.push_back(p);
         updateGLData(p);

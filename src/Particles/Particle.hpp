@@ -24,6 +24,7 @@ public:
 	void setScale(float sca);
 	void setAlpha(float alp);
 	void setT(float t);
+	void setPercent(float per);
 
 	void updatePosition(glm::vec3 update);
 	int getIndex();
@@ -31,6 +32,7 @@ public:
 	glm::vec3 getColor();
 	float getScale();
 	float getAlpha();
+	float getPercent();
 	void setOrigin(glm::vec3 origin);
 
 private:
@@ -53,6 +55,7 @@ private:
 	float tEnd;
 
 	bool alphaToggle;
+	float percent;
 };
 
 #endif
