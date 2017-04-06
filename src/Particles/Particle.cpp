@@ -59,23 +59,21 @@ void Particle::update(float dt) {
     // if (index == 1) {
     //     std::cout << t << std::endl;
     // }
-    float radius = 3;
-
-
+    static float radius = 1;
     static float period = 1;
 
-    radius = (glm::sin(t) + glm::cos(t));
+    radius += (sin(t)*.01 + cos(t)*.01) * .01;
     position.x = radius * glm::cos(t * period);
-    position.y = fmod(t, 360)/4;
+    position.y = fmod(t, 360)/20;
     position.z = radius * glm::sin(t * period);
     // position += glm::vec3(origin.x, origin.y, origin.z);
 
-    glm::mat4 transform;
-    glm::vec3 rotationAxis(1.0f, 0.0f, 0.0f);
+    // glm::mat4 transform;
+    // glm::vec3 rotationAxis(1.0f, 0.0f, 0.0f);
 
-    transform = glm::translate(transform, glm::vec3(position.x, position.x, position.z));
-    // transform = glm::rotate(transform, 30.0f, rotationAxis);
-    position = glm::vec3(transform * glm::vec4(position, 1.0f));
+    // transform = glm::translate(transform, glm::vec3(position.x, position.x, position.z));
+    // // transform = glm::rotate(transform, 30.0f, rotationAxis);
+    // position = glm::vec3(transform * glm::vec4(position, 1.0f));
 }
 
 

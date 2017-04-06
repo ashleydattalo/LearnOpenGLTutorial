@@ -119,6 +119,10 @@ public:
             this->Zoom = 45.0f;
     }
 
+    glm::vec3 getCamPos() {
+        return this->Position;
+    }
+
 private:
     // Calculates the front vector from the Camera's (updated) Eular Angles
     void updateCameraVectors()

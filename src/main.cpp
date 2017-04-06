@@ -263,6 +263,13 @@ int main()
         // glDrawArrays(GL_TRIANGLES, 0, 36);
         // glBindVertexArray(0);
 
+        // std::cout << camera.getCamPos().x;
+        // std::cout << " ";
+        // std::cout << camera.getCamPos().y;
+        // std::cout << " ";
+        // std::cout << camera.getCamPos().z;
+        // std::cout << std::endl;
+        
         particles->render(projection, view);
 
         // Swap the screen buffers
