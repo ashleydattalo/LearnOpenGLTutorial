@@ -17,21 +17,21 @@ vec4 getPos();
 void main()
 {
 	//aPos.x + abs(aPos.x);
-	vec4 tempPos = vec4(aPos.x, aPos.y, aPos.z, aPos.w);
-    gl_Position = P * V * tempPos;
-    vecPos = P * V * tempPos;
+	//vec4 tempPos = vec4(aPos.x, aPos.y, aPos.z, aPos.w);
+    //gl_Position = P * V * tempPos;
+    //vecPos = P * V * tempPos;
 
 
-    //vec4 newPos;
-    //float newTime = initialTime + time;
-	//newPos.x = radius * sin(time);
-	//newPos.y = radius * (time);
-    //newPos.z = radius * cos(time);
+    vec4 newPos;
+    float newTime = initialTime + time;
+	newPos.x = radius * sin(time);
+	newPos.y = radius * (time);
+    newPos.z = radius * cos(time);
 
-    //newPos += aPos;
+    newPos += aPos;
     
-    //gl_Position = P * V * newPos;
-    //vecPos = P * V * newPos;
+    gl_Position = P * V * newPos;
+    vecPos = P * V * newPos;
     
 
     vecCol = vec4(aCol, aAlp);

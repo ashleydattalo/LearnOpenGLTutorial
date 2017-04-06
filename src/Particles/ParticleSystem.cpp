@@ -25,7 +25,7 @@ ParticleSystem::ParticleSystem()
 {
     origin = glm::vec3(0.0f, 0.0f, 0.0f);
     particleType = "general";
-    nParticles = 7000;
+    nParticles = 15000;
     id = numPSys++;
     init();
 }
