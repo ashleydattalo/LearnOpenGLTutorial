@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/transform.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #define GLEW_STATIC
 #include <GL/glew.h>
@@ -16,12 +17,15 @@
 
 #define SHADER_PATH "/Users/ashleydattalo/graphics/LearnOpenGL/src/Shaders/"
 
+#define HEIGHT 8
+
 static int numPSys = 0;
+float currTime = 0;
 ParticleSystem::ParticleSystem()
 {
     origin = glm::vec3(0.0f, 0.0f, 0.0f);
     particleType = "general";
-    nParticles = 400;
+    nParticles = 6000;
     id = numPSys++;
     init();
 }
@@ -45,8 +49,87 @@ void ParticleSystem::init() {
     createParticles();
     createShader();
 }
+float ParticleSystem::getR(float percent) {
+    if (percent <= .5) {
+        return 1 - (2 * percent);
+    }
+    else {
+        return (percent-.5) * 2;
+    }
+}
+float ParticleSystem::getG(float percent) {
+    if (percent <= .25) {
+        return percent * 4;
+    }
+    else if (percent <= .5) {
+        return 1;
+    }
+    else if (percent <= .75) {
+        return 1 - ((percent-.5) * 4);
+    } 
+    else {
+        return 0;
+    }
+}
+float ParticleSystem::getB(float percent) {
+    if (percent <= .25) {
+        return 0;
+    }
+    else if (percent <= .5) {
+        return (percent-.25) * 4;
+    }
+    else if (percent <= .75) {
+        return 1;
+    } 
+    else {
+        return 1-((percent-.75) * 4);
+    }
+}
+glm::vec3 ParticleSystem::rgbVal(float percent) {
+    return glm::vec3(getR(percent), getG(percent), getB(percent));
+}
+
+float ParticleSystem::getPercentage(float y) {
+    float min = 0;
+    float max = HEIGHT;
+
+    return y / (max - min);
+}
+
+void ParticleSystem::setRainbow() {
+    // float min = 0;
+    // float max = HEIGHT;
+
+    // float step = 1 / (max - min);
+    // //ex: height = 4
+    // //    .25
+    // //    .5
+    // //    .75
+    // //    1
+
+    // static float percentage = 0;
+
+    // for (int i = 1; i <= max; i++) {
+    //     //step = step + percentage;
+    // }
+    std::cout << std::endl;
+    for (Particle *p : particles) {
+        glm::vec3 pos = p->getPosition();
+        float percentage = getPercentage(pos.y);
+        // std::cout << currTime << " ";
+        // std::cout << percentage << " ";
+        // std::cout << std::endl;
+        if (percentage > 1 || percentage < 0) {
+            // std::cout << "percent is outside range [0,1]" << std::endl;
+            exit(0);
+        }
+        // std::cout << percentage<<": "<< glm::to_string(rgbVal(percentage)) << std::endl;
+        p->setColor(rgbVal(percentage));
+    }
+}
 
 void ParticleSystem::update(float dt) {
+    setRainbow();
     for (Particle *p : particles) {
         p->update(dt);
         updateGLData(p);
@@ -61,6 +144,8 @@ void ParticleSystem::render(const glm::mat4 &projection, const glm::mat4 &view) 
     shader->use();
 
     glBindVertexArray(VAO);
+
+    currTime = fmod(glfwGetTime(), HEIGHT);
 
     GLint timeLoc = glGetUniformLocation(shader->getProg(), "time");
     glUniform1f(timeLoc, glfwGetTime());
@@ -111,14 +196,14 @@ void ParticleSystem::createParticles() {
         color += inc;
         glm::vec3 col = glm::vec3(.3, .2, color);
         // glm::vec3 pos = glm::vec3(randNum(-1.0f, 1.0f), randNum(-355.0f,-205.0f), randNum(0.5f, 1.0f));
-        glm::vec3 pos = glm::vec3(randNum(-1.0f, 1.0f), 100*color, randNum(0.5f, 1.0f));
-        float scale = 100 * color;
+        glm::vec3 pos = glm::vec3(randNum(-1.0f, 1.0f), HEIGHT*color, randNum(0.5f, 1.0f));
+        float scale = 50 * color;
         float t = 100 * color;
 
         float alpha = 1;
 
         // col = glm::vec3(1.0f);
-        // scale = 15;
+        scale = 5;
         // alpha = 1;
 
         p->setPosition(pos);

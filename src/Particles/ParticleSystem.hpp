@@ -28,6 +28,12 @@ public:
     // void collidedWithOrb(const glm::vec3 &playerPos);
     // void setForce(const glm::vec3 &force);
     void debug();
+    float getR(float percent);
+    float getG(float percent);
+    float getB(float percent);
+    glm::vec3 rgbVal(float percent);
+    float getPercentage(float y);
+    void setRainbow();
 
 private:
 	int id;

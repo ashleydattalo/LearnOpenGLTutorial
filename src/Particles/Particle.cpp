@@ -31,7 +31,7 @@ Particle::Particle(glm::vec3 position, glm::vec3 color, float scale, float alpha
 Particle::~Particle() {}
 
 void Particle::init() {
-    alphaToggle = false;
+    alphaToggle = true;
     rebirth(t);
 }
 

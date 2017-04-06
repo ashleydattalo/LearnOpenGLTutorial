@@ -16,6 +16,7 @@ void main()
     	float y = cord.y;
 
     	color = vec4(vecPos.xyz, getCol(x,y));
+    	color = vecCol;
     }
     else {
         color = vec4(1.0f, 1.0f, 1.0f, 0.0f);
