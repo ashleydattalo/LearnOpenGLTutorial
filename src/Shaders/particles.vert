@@ -17,7 +17,7 @@ vec4 getPos();
 void main()
 {
 	//aPos.x + abs(aPos.x);
-	vec4 tempPos = vec4(aPos.x*aPos.y, aPos.y, aPos.y*aPos.z, aPos.w);
+	vec4 tempPos = vec4(aPos.x, aPos.y, aPos.z, aPos.w);
     gl_Position = P * V * tempPos;
     vecPos = P * V * tempPos;
 

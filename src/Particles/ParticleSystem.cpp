@@ -201,7 +201,7 @@ void ParticleSystem::createParticles() {
         // glm::vec3 col = glm::vec3(.3, .2, color);
         glm::vec3 col = rgbVal(color);
         // glm::vec3 pos = glm::vec3(randNum(-1.0f, 1.0f), randNum(-355.0f,-205.0f), randNum(0.5f, 1.0f));
-        glm::vec3 pos = glm::vec3(randNum(-1.0f, 1.0f), HEIGHT*color, randNum(0.5f, 1.0f));
+        glm::vec3 pos = glm::vec3(randNum(-5.0f, 5.0f), HEIGHT*color, randNum(-5.0f, 5.0f));
         float scale = 50 * color;
         float t = 20*color;
 
