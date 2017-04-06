@@ -6,13 +6,22 @@ uniform float time;
 in vec4 vecCol;
 in vec4 vecPos;
 
+float getCol(float x, float y);
+
 void main()
 {
     vec2 cord = 2.0 * gl_PointCoord - 1.0;
     if (dot(cord, cord) <= 1.0f) {
-    	color = vecCol;
+    	float x = cord.x;
+    	float y = cord.y;
+
+    	color = vec4(vecPos.xyz, getCol(x,y));
     }
     else {
         color = vec4(1.0f, 1.0f, 1.0f, 0.0f);
     }
+}
+
+float getCol(float x, float y) {
+	return x*x + y*y;
 }

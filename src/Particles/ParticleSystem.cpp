@@ -21,7 +21,7 @@ ParticleSystem::ParticleSystem()
 {
     origin = glm::vec3(0.0f, 0.0f, 0.0f);
     particleType = "general";
-    nParticles = 6000;
+    nParticles = 400;
     id = numPSys++;
     init();
 }
@@ -57,8 +57,6 @@ void ParticleSystem::render(const glm::mat4 &projection, const glm::mat4 &view) 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // glDisable(GL_DEPTH_TEST);
-
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
     shader->use();
 
@@ -111,11 +109,12 @@ void ParticleSystem::createParticles() {
     for (int i = 1; i <= nParticles; i++) {
         Particle *p = new Particle(i, origin, particleType);
         color += inc;
-        std::cout << i << " " << color << std::endl;
         glm::vec3 col = glm::vec3(.3, .2, color);
-        glm::vec3 pos = glm::vec3(randNum(-1.0f, 1.0f), randNum(-35.0f,-15.0f), randNum(0.5f, 1.0f));
-        float scale = 20 * color;
-        float t = 40 * color;
+        // glm::vec3 pos = glm::vec3(randNum(-1.0f, 1.0f), randNum(-355.0f,-205.0f), randNum(0.5f, 1.0f));
+        glm::vec3 pos = glm::vec3(randNum(-1.0f, 1.0f), 100*color, randNum(0.5f, 1.0f));
+        float scale = 100 * color;
+        float t = 100 * color;
+
         float alpha = 1;
 
         // col = glm::vec3(1.0f);

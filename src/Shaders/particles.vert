@@ -11,8 +11,10 @@ out vec4 vecPos;
 
 void main()
 {
-    gl_Position = P * V * aPos;
-    vecPos = P * V * aPos;
+	aPos.x + abs(aPos.x);
+	vec4 tempPos = vec4(aPos.x*aPos.y*aPos.y, aPos.y, aPos.y*aPos.z, aPos.w);
+    gl_Position = P * V * tempPos;
+    vecPos = P * V * tempPos;
     vecCol = vec4(aCol, aAlp);
     gl_PointSize = aSca;
 }
