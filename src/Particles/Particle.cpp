@@ -63,10 +63,11 @@ void Particle::update(float dt) {
     static float radius = 1;
     static float period = 1;
 
-    radius += (cos(10*t)) * .003;
-    radius += sin(10*t) * .003;
-    period = fmod(period, 100);
-    // radius = fmod(radius, 10);
+    // radius += (cos(10*t)) * .003;
+    // radius += sin(10*t) * .003;
+    // period = fmod(period, 100);
+    radius -= cos(t) * .2 + sin(t) * .001;
+    radius = fmod(radius, 10);
     position.x = radius * glm::cos(t * period);
     position.y = fmod(t, 360)/10;
     position.z = radius * glm::sin(t * period);
