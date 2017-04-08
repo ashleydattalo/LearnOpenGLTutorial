@@ -69,98 +69,193 @@ int main()
     }    
 
     // Define the viewport dimensions
-    int width, height;
-    glfwGetFramebufferSize(window, &width, &height);  
-    glViewport(0, 0, width, height);
-    glEnable(GL_DEPTH_TEST);
+    // int width, height;
+    // glfwGetFramebufferSize(window, &width, &height);  
+    // glViewport(0, 0, width, height);
+    // glEnable(GL_DEPTH_TEST);
 
-    Shader *lightingShader = new Shader(SHADER_PATH "lighting.vert", SHADER_PATH "lighting.frag");
-    Shader *lampShader = new Shader(SHADER_PATH "lamp.vert", SHADER_PATH "lamp.frag");
+    // Shader *lightingShader = new Shader(SHADER_PATH "lighting.vert", SHADER_PATH "lighting.frag");
+    // Shader *lampShader = new Shader(SHADER_PATH "lamp.vert", SHADER_PATH "lamp.frag");
 
-    particles = new ParticleSystem();
+    // particles = new ParticleSystem();
 
-    GLfloat vertices[] = {
-        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
-         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
-         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
-        -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
-        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+    // GLfloat vertices[] = {
+    //     -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+    //      0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+    //      0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+    //      0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+    //     -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+    //     -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
 
-        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+    //     -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+    //      0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+    //      0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+    //      0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+    //     -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+    //     -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
 
-        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+    //     -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+    //     -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+    //     -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+    //     -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+    //     -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+    //     -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
 
-         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+    //      0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+    //      0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+    //      0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+    //      0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+    //      0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+    //      0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
 
-        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+    //     -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+    //      0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+    //      0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+    //      0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+    //     -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+    //     -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
 
-        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-         0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
-    };
-    glm::vec3 cubePositions[] = {
-        glm::vec3( 0.0f,  0.0f,  0.0f),
-        glm::vec3( 2.0f,  5.0f, -15.0f),
-        glm::vec3(-1.5f, -2.2f, -2.5f),
-        glm::vec3(-3.8f, -2.0f, -12.3f),
-        glm::vec3( 2.4f, -0.4f, -3.5f),
-        glm::vec3(-1.7f,  3.0f, -7.5f),
-        glm::vec3( 1.3f, -2.0f, -2.5f),
-        glm::vec3( 1.5f,  2.0f, -2.5f),
-        glm::vec3( 1.5f,  0.2f, -1.5f),
-        glm::vec3(-1.3f,  1.0f, -1.5f)
-    };
-    // First, set the container's VAO (and VBO)
-    GLuint VBO, containerVAO;
-    glGenVertexArrays(1, &containerVAO);
-    glGenBuffers(1, &VBO);
+    //     -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+    //      0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+    //      0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+    //      0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+    //     -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+    //     -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+    // };
+    // glm::vec3 cubePositions[] = {
+    //     glm::vec3( 0.0f,  0.0f,  0.0f),
+    //     glm::vec3( 2.0f,  5.0f, -15.0f),
+    //     glm::vec3(-1.5f, -2.2f, -2.5f),
+    //     glm::vec3(-3.8f, -2.0f, -12.3f),
+    //     glm::vec3( 2.4f, -0.4f, -3.5f),
+    //     glm::vec3(-1.7f,  3.0f, -7.5f),
+    //     glm::vec3( 1.3f, -2.0f, -2.5f),
+    //     glm::vec3( 1.5f,  2.0f, -2.5f),
+    //     glm::vec3( 1.5f,  0.2f, -1.5f),
+    //     glm::vec3(-1.3f,  1.0f, -1.5f)
+    // };
+    // // First, set the container's VAO (and VBO)
+    // GLuint VBO, containerVAO;
+    // glGenVertexArrays(1, &containerVAO);
+    // glGenBuffers(1, &VBO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    // glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    // glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    glBindVertexArray(containerVAO);
-    // Position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
-    glEnableVertexAttribArray(0);
+    // glBindVertexArray(containerVAO);
+    // // Position attribute
+    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
+    // glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-    glEnableVertexAttribArray(1);
-    glBindVertexArray(0);
+    // glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+    // glEnableVertexAttribArray(1);
+    // glBindVertexArray(0);
 
-    // Then, we set the light's VAO (VBO stays the same. After all, the vertices are the same for the light object (also a 3D cube))
-    GLuint lightVAO;
-    glGenVertexArrays(1, &lightVAO);
-    glBindVertexArray(lightVAO);
-    // We only need to bind to the VBO (to link it with glVertexAttribPointer), no need to fill it; the VBO's data already contains all we need.
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    // Set the vertex attributes (only position data for the lamp))
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
-    glEnableVertexAttribArray(0);
-    glBindVertexArray(0);
+    // // Then, we set the light's VAO (VBO stays the same. After all, the vertices are the same for the light object (also a 3D cube))
+    // GLuint lightVAO;
+    // glGenVertexArrays(1, &lightVAO);
+    // glBindVertexArray(lightVAO);
+    // // We only need to bind to the VBO (to link it with glVertexAttribPointer), no need to fill it; the VBO's data already contains all we need.
+    // glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    // // Set the vertex attributes (only position data for the lamp))
+    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
+    // glEnableVertexAttribArray(0);
+    // glBindVertexArray(0);
+
+
+
+
+    //transform feedback
+    const GLchar* vertexShaderSrc = 
+        "#version 330 core\n"
+        "layout (location = 0) in float inValue;\n"
+        "out float outValue;\n"
+        
+        "void main()\n"
+        "{\n"
+            "outValue = sqrt(inValue);\n"
+        "}\n";
+
+        const GLchar* vertexShaderSrc2 = "#version 330 core\n"
+    "layout (location = 0) in vec3 position;\n"
+    "void main()\n"
+    "{\n"
+    "gl_Position = vec4(position.x, position.y, position.z, 1.0);\n"
+    "}\0";
+
+    // Compile shader
+    GLuint shader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(shader, 1, &vertexShaderSrc, NULL);
+    glCompileShader(shader);
+
+    GLint success;
+    GLchar infoLog[512];
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        glGetShaderInfoLog(shader, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+    }
+
+    // Create program and specify transform feedback variables
+    GLuint program = glCreateProgram();
+    glAttachShader(program, shader);
+
+    const GLchar* feedbackVaryings[] = { "outValue" };
+    glTransformFeedbackVaryings(program, 1, feedbackVaryings, GL_INTERLEAVED_ATTRIBS);
+
+    glLinkProgram(program);
+    glUseProgram(program);
+
+    // Create VAO
+    GLuint vao;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    // Create input VBO and vertex format
+    GLfloat data[] = { 1.0f, 2.0f, 3.0f, 4.0f, 5.0f };
+
+    GLuint vbo;
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
+
+    GLint inputAttrib = glGetAttribLocation(program, "inValue");
+    glEnableVertexAttribArray(inputAttrib);
+    glVertexAttribPointer(inputAttrib, 1, GL_FLOAT, GL_FALSE, 0, 0);
+
+    // Create transform feedback buffer
+    GLuint tbo;
+    glGenBuffers(1, &tbo);
+    glBindBuffer(GL_ARRAY_BUFFER, tbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(data), nullptr, GL_STATIC_READ);
+
+    // Perform feedback transform
+    glEnable(GL_RASTERIZER_DISCARD);
+
+    glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tbo);
+
+    glBeginTransformFeedback(GL_POINTS);
+        glDrawArrays(GL_POINTS, 0, 5);
+    glEndTransformFeedback();
+
+    glDisable(GL_RASTERIZER_DISCARD);
+
+    glFlush();
+
+    // Fetch and print results
+    GLfloat feedback[5];
+    glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, sizeof(feedback), feedback);
+
+    printf("%f %f %f %f %f\n", feedback[0], feedback[1], feedback[2], feedback[3], feedback[4]);
+
+    glDeleteProgram(program);
+    glDeleteShader(shader);
+
+    glDeleteBuffers(1, &tbo);
+    glDeleteBuffers(1, &vbo);
+
+    glDeleteVertexArrays(1, &vao);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -169,7 +264,7 @@ int main()
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         // std::cout << deltaTime << std::endl;
-        particles->update(deltaTime);
+        //particles->update(deltaTime);
 
         // Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
         glfwPollEvents();
@@ -271,7 +366,7 @@ int main()
         // std::cout << camera.getCamPos().z;
         // std::cout << std::endl;
         
-        particles->render(projection, view);
+        //particles->render(projection, view);
 
         // Swap the screen buffers
         glfwSwapBuffers(window);
