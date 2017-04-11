@@ -173,7 +173,7 @@ int main()
         
         "void main()\n"
         "{\n"
-            "outValue = sqrt(inValue);\n"
+            "outValue = 1+inValue;\n"
         "}\n";
 
         const GLchar* vertexShaderSrc2 = "#version 330 core\n"
@@ -213,12 +213,12 @@ int main()
     glBindVertexArray(vao);
 
     // Create input VBO and vertex format
-    GLfloat data[] = { 1.0f, 2.0f, 3.0f, 4.0f, 5.0f };
+    GLfloat data[] = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
 
     GLuint vbo;
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STREAM_DRAW);
 
     GLint inputAttrib = glGetAttribLocation(program, "inValue");
     glEnableVertexAttribArray(inputAttrib);
@@ -230,24 +230,35 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, tbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(data), nullptr, GL_STATIC_READ);
 
-    // Perform feedback transform
-    glEnable(GL_RASTERIZER_DISCARD);
 
     glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tbo);
-
-    glBeginTransformFeedback(GL_POINTS);
-        glDrawArrays(GL_POINTS, 0, 5);
-    glEndTransformFeedback();
-
-    glDisable(GL_RASTERIZER_DISCARD);
-
-    glFlush();
-
-    // Fetch and print results
     GLfloat feedback[5];
-    glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, sizeof(feedback), feedback);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-    printf("%f %f %f %f %f\n", feedback[0], feedback[1], feedback[2], feedback[3], feedback[4]);
+
+        for (int i = 0; i < 10; i++) {
+
+
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(data), data);
+            // Perform feedback transform
+            glEnable(GL_RASTERIZER_DISCARD);
+
+            glBeginTransformFeedback(GL_POINTS);
+                glDrawArrays(GL_POINTS, 0, 5);
+            glEndTransformFeedback();
+
+            glDisable(GL_RASTERIZER_DISCARD);
+            glFlush();
+
+            // Fetch and print results
+            glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, sizeof(feedback), feedback);
+            printf("%d: %f %f %f %f %f\n", i, feedback[0], feedback[1], feedback[2], feedback[3], feedback[4]);
+            for (int j = 0; j < 5; j++) {
+                data[j] = feedback[j];
+            }
+
+        }
+
 
     glDeleteProgram(program);
     glDeleteShader(shader);
