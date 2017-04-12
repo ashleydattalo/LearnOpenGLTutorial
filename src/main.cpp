@@ -3,12 +3,14 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <stdio.h>
 #include <iostream>
 #include <vector>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
 
 #define SHADER_PATH "/Users/ashleydattalo/graphics/LearnOpenGL/src/Shaders/"
 #define RESOURCE_PATH "/Users/ashleydattalo/graphics/LearnOpenGL/resources/"
@@ -38,9 +40,90 @@ glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 ParticleSystem *particles;
 
+std::vector<float> data;
+int numParticles;
+int numVertices = 0;
+int numFaces = 0;
+
 float randFloat(float min, float max) {
     float r = rand() / (float)RAND_MAX;
     return (1.0f - r) * min + r * max;
+}
+
+void addLine(glm::vec3 vert1, glm::vec3 vert2) {
+
+    std::cout << std::endl <<  "vert1: ";
+    std::cout << vert1.x << " ";
+    std::cout << vert1.y << " ";
+    std::cout << vert1.z << " ";
+
+    std::cout << "vert2: ";
+    std::cout << vert2.x << " ";
+    std::cout << vert2.y << " ";
+    std::cout << vert2.z << " ";
+
+    float minX, maxX;
+    float minY, maxY;
+    float minZ, maxZ;
+
+    float step = 5.0f;
+    float incX, incY, incZ;
+
+    minX = fmin(vert1.x, vert2.x);
+    minY = fmin(vert1.y, vert2.y);
+    minZ = fmin(vert1.z, vert2.z);
+    // std::cout << minX << " ";
+    // std::cout << minY << " ";
+    // std::cout << minZ << " ";
+
+    maxX = fmax(vert1.x, vert2.x);
+    maxY = fmax(vert1.y, vert2.y);
+    maxZ = fmax(vert1.z, vert2.z);
+
+    // std::cout << ", ";
+    // std::cout << maxX << " ";
+    // std::cout << maxY << " ";
+    // std::cout << maxZ << " ";
+
+    incX = (maxX-minX)/step;
+    incY = (maxY-minY)/step;
+    incZ = (maxZ-minZ)/step;
+    
+    // std::cout << ", ";
+    // std::cout << incX << " ";
+    // std::cout << incY << " ";
+    // std::cout << incZ << " , ";
+
+
+    for (int i = 1; i < step; i++) {
+        if (vert1.x < vert2.x) {
+            data.push_back(minX + i * incX);
+        }
+        else {
+            data.push_back(maxX - i * incX);   
+        }
+        if (vert1.y < vert2.y) {
+            data.push_back(minY + i * incY);
+        }
+        else {
+            data.push_back(maxY - i * incY);   
+        }
+        if (vert1.z < vert2.z) {
+            data.push_back(minZ + i * incZ);
+        }
+        else {
+            data.push_back(maxZ - i * incZ);   
+        }
+        
+        std::cout << std::endl;
+
+        std::cout << "   " << minX + i * incX << " ";
+        std::cout << "   " << minY + i * incY << " ";
+        std::cout << "   " << minZ + i * incZ << " ";
+
+        numVertices++;
+    }
+
 }
 
 int main()
@@ -186,7 +269,8 @@ int main()
         "void main()\n"
         "{\n"
             "outPos = pos;\n"
-            "outPos += .01;\n"
+            "outPos.x += .01;\n"
+            // "outPos.y = sin(pos.x);\n"
 
             "gl_Position = projection * view * model * vec4(outPos, 1.0f);\n"
             "gl_PointSize = 1.0f;\n"
@@ -255,15 +339,101 @@ int main()
     // Create input VBO and vertex format
     // GLfloat data[] = { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
 
-    std::vector<float> data;
-    int numParticles = 1000000;
-    for (int i = 0; i < numParticles; i++) {
-        data.push_back(randFloat(-30, 30));
-        data.push_back(randFloat(-30, 30));
-        data.push_back(randFloat(-300, 300));
+
+    // for (int i = 0; i < numParticles; i++) {
+    //     data.push_back(randFloat(-30, 30));
+    //     data.push_back(randFloat(-30, 30));
+    //     data.push_back(randFloat(-300, 300));
         
-        // data.push_back(0.2f);
+    //     // data.push_back(0.2f);
+    // }
+
+    std::vector< unsigned int > vertexIndices, uvIndices, normalIndices;
+    std::vector< float > temp_vertices;
+    std::vector< glm::vec2 > temp_uvs;
+    std::vector< glm::vec3 > temp_normals;
+
+    const char *path = "../resources/bunny.obj";
+
+    FILE * file = fopen(path, "r");
+    if( file == NULL ){
+        printf("Impossible to open the file !\n");
+        return false;
     }
+    while( 1 ){
+        char lineHeader[128];
+        // read the first word of the line
+        int res = fscanf(file, "%s", lineHeader);
+        if (res == EOF)
+            break; // EOF = End Of File. Quit the loop.
+
+        if ( strcmp( lineHeader, "v" ) == 0 ){
+            glm::vec3 vertex;
+            fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z );
+            vertex *=20;
+            data.push_back(vertex.x);
+            data.push_back(vertex.y);
+            data.push_back(vertex.z);
+            numVertices++;
+        }
+
+        if ( strcmp( lineHeader, "f" ) == 0 ){
+            glm::vec3 triangle;
+            fscanf(file, "%f %f %f\n", &triangle.x, &triangle.y, &triangle.z );
+
+            std::cout << std::endl << triangle.x << " ";
+            std::cout << triangle.y << " ";
+            std::cout << triangle.z << " ";
+
+            glm::vec3 vert1, vert2, vert3;
+
+            float offset;
+            offset = (triangle.x -1) * 3;
+            vert1.x = data[offset + 0];
+            vert1.y = data[offset + 1];
+            vert1.z = data[offset + 2];
+
+            offset = (triangle.y -1) * 3;
+            vert2.x = data[offset + 0];
+            vert2.y = data[offset + 1];
+            vert2.z = data[offset + 2];
+
+            offset = (triangle.z -1) * 3;
+            vert3.x = data[offset + 0];
+            vert3.y = data[offset + 1];
+            vert3.z = data[offset + 2];
+
+
+            addLine(vert1, vert2);
+            addLine(vert1, vert3);
+            addLine(vert2, vert3);
+
+            numFaces++;
+        }
+
+    }
+    numParticles = numVertices;
+    for (int i = 0; i < data.size(); i+=3) {
+        // printf("%f %f %f\n", data[i], data[i+1], data[i + 2]);
+    }
+    std::cout << "numVertices: " << numVertices << std::endl;
+    std::cout << "numFaces: " << numFaces << std::endl;
+
+    // glm::vec3 tri(5.0f);
+    // glm::vec3 vertexTest;
+    // float offset = (tri.x -1) * 3;
+    // vertexTest.x = data[offset + 0];
+    // vertexTest.y = data[offset + 1];
+    // vertexTest.z = data[offset + 2];
+
+
+    // std::cout << std::endl << vertexTest.x << " ";
+    // std::cout << vertexTest.y << " ";
+    // std::cout << vertexTest.z << " ";
+
+
+
+
 
     GLuint vbo;
     glGenBuffers(1, &vbo);
