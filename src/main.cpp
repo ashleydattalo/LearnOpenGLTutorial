@@ -22,7 +22,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void do_movement();
 
-const GLuint WIDTH = 800, HEIGHT = 600;
+const GLuint WIDTH = 1200, HEIGHT = 1000;
 
 bool keys[1024]; 
 bool firstMouse = true;
@@ -37,6 +37,11 @@ Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 ParticleSystem *particles;
+
+float randFloat(float min, float max) {
+    float r = rand() / (float)RAND_MAX;
+    return (1.0f - r) * min + r * max;
+}
 
 int main()
 {
@@ -168,40 +173,75 @@ int main()
     //transform feedback
     const GLchar* vertexShaderSrc = 
         "#version 330 core\n"
-        "layout (location = 0) in float inValue;\n"
-        "out float outValue;\n"
+        "layout (location = 0) in vec3 pos;\n"
+        "layout (location = 1) in float color;\n"
+
+        "uniform mat4 model;\n"
+        "uniform mat4 view;\n"
+        "uniform mat4 projection;\n"
         
+        "out vec3 outPos;\n"
+        "out float col;\n"
+
         "void main()\n"
         "{\n"
-            "outValue = 1+inValue;\n"
+            "outPos = pos;\n"
+            "outPos += .01;\n"
+
+            "gl_Position = projection * view * model * vec4(outPos, 1.0f);\n"
+            "gl_PointSize = 1.0f;\n"
+
+            "col = color;\n"
+
         "}\n";
 
-        const GLchar* vertexShaderSrc2 = "#version 330 core\n"
-    "layout (location = 0) in vec3 position;\n"
-    "void main()\n"
-    "{\n"
-    "gl_Position = vec4(position.x, position.y, position.z, 1.0);\n"
-    "}\0";
+        // Fragment shader
+    const GLchar* fragShaderSrc =
+        "#version 330 core\n"
 
-    // Compile shader
-    GLuint shader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(shader, 1, &vertexShaderSrc, NULL);
-    glCompileShader(shader);
+        "in vec3 outPos;\n"
+        "in float col;\n"
+        "out vec4 outColor;\n"
+
+        "void main()\n"
+        "{\n"
+            // "outColor = vec4(0.0f, 0.0f, col, 1.0);\n"
+            "outColor = vec4(1.0f);\n"
+        "}\n";
+
 
     GLint success;
     GLchar infoLog[512];
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+    // Compile shaderVert
+    GLuint shaderVert = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(shaderVert, 1, &vertexShaderSrc, NULL);
+    glCompileShader(shaderVert);
+
+    glGetShaderiv(shaderVert, GL_COMPILE_STATUS, &success);
     if (!success)
     {
-        glGetShaderInfoLog(shader, 512, NULL, infoLog);
+        glGetShaderInfoLog(shaderVert, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+    }
+
+    // Compile shaderFrag
+    GLuint shaderFrag = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(shaderFrag, 1, &fragShaderSrc, NULL);
+    glCompileShader(shaderFrag);
+
+    glGetShaderiv(shaderFrag, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        glGetShaderInfoLog(shaderFrag, 512, NULL, infoLog);
         std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
     }
 
     // Create program and specify transform feedback variables
     GLuint program = glCreateProgram();
-    glAttachShader(program, shader);
+    glAttachShader(program, shaderVert);
+    glAttachShader(program, shaderFrag);
 
-    const GLchar* feedbackVaryings[] = { "outValue" };
+    const GLchar* feedbackVaryings[] = { "outPos" };
     glTransformFeedbackVaryings(program, 1, feedbackVaryings, GL_INTERLEAVED_ATTRIBS);
 
     glLinkProgram(program);
@@ -213,60 +253,47 @@ int main()
     glBindVertexArray(vao);
 
     // Create input VBO and vertex format
-    GLfloat data[] = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+    // GLfloat data[] = { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
+
+    std::vector<float> data;
+    int numParticles = 1000000;
+    for (int i = 0; i < numParticles; i++) {
+        data.push_back(randFloat(-30, 30));
+        data.push_back(randFloat(-30, 30));
+        data.push_back(randFloat(-300, 300));
+        
+        // data.push_back(0.2f);
+    }
 
     GLuint vbo;
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STREAM_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, data.size()*sizeof(float), &data[0], GL_STREAM_DRAW);
 
-    GLint inputAttrib = glGetAttribLocation(program, "inValue");
+    GLint inputAttrib = glGetAttribLocation(program, "pos");
     glEnableVertexAttribArray(inputAttrib);
-    glVertexAttribPointer(inputAttrib, 1, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(inputAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+
+    // GLint colAttrib = glGetAttribLocation(program, "color");
+    // glEnableVertexAttribArray(colAttrib);
+    // glVertexAttribPointer(colAttrib, 1, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+
 
     // Create transform feedback buffer
     GLuint tbo;
     glGenBuffers(1, &tbo);
     glBindBuffer(GL_ARRAY_BUFFER, tbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(data), nullptr, GL_STATIC_READ);
+    glBufferData(GL_ARRAY_BUFFER, data.size()*sizeof(float), nullptr, GL_STATIC_READ);
 
 
     glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tbo);
-    GLfloat feedback[5];
+    std::vector<float> feedback;
+    feedback.resize(data.size());
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
 
-        for (int i = 0; i < 10; i++) {
-
-
-            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(data), data);
-            // Perform feedback transform
-            glEnable(GL_RASTERIZER_DISCARD);
-
-            glBeginTransformFeedback(GL_POINTS);
-                glDrawArrays(GL_POINTS, 0, 5);
-            glEndTransformFeedback();
-
-            glDisable(GL_RASTERIZER_DISCARD);
-            glFlush();
-
-            // Fetch and print results
-            glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, sizeof(feedback), feedback);
-            printf("%d: %f %f %f %f %f\n", i, feedback[0], feedback[1], feedback[2], feedback[3], feedback[4]);
-            for (int j = 0; j < 5; j++) {
-                data[j] = feedback[j];
-            }
-
-        }
-
-
-    glDeleteProgram(program);
-    glDeleteShader(shader);
-
-    glDeleteBuffers(1, &tbo);
-    glDeleteBuffers(1, &vbo);
-
-    glDeleteVertexArrays(1, &vao);
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_PROGRAM_POINT_SIZE);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -323,15 +350,16 @@ int main()
         glm::mat4 projection = glm::perspective(camera.Zoom + 20.0f, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 200.0f);
         // Get the uniform locations
         
-        // GLint modelLoc = glGetUniformLocation(lightingShader->getProg(), "model");
-        // GLint viewLoc  = glGetUniformLocation(lightingShader->getProg(),  "view");
-        // GLint projLoc  = glGetUniformLocation(lightingShader->getProg(),  "projection");
-        // // Pass the matrices to the shader
-        // glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-        // glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+        GLint modelLoc = glGetUniformLocation(program, "model");
+        GLint viewLoc  = glGetUniformLocation(program,  "view");
+        GLint projLoc  = glGetUniformLocation(program,  "projection");
+        // Pass the matrices to the shader
+        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
-
-        // glm::mat4 model;
+        glm::mat4 model;
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        
         // glBindVertexArray(containerVAO);
         // for (GLuint i = 0; i < 10; i++)
         // {
@@ -378,10 +406,48 @@ int main()
         // std::cout << std::endl;
         
         //particles->render(projection, view);
+        static int i = 0;
+        // std::cout << std::endl << i++ << ": ";
+            glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT);
+
+            // Perform feedback transform
+            // glEnable(GL_RASTERIZER_DISCARD);
+
+            glBeginTransformFeedback(GL_POINTS);
+                glDrawArrays(GL_POINTS, 0, numParticles);
+            glEndTransformFeedback();
+
+            // glDisable(GL_RASTERIZER_DISCARD);
+            // glFlush();
+            glfwSwapBuffers(window);
+
+            // Fetch and print results
+            glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, feedback.size()*sizeof(float), &feedback[0]);
+            // for (int j = 0; j < data.size(); j+=3) {
+            //     printf("%d ~ %d: %f %f %f\n", i, j, feedback[j], feedback[j+1], feedback[j+2]);
+            //     data[j] = feedback[j];
+            // }
+            for (int j = 0; j < data.size(); j++) {
+                // printf("%f ", data[j]);
+                data[j] = feedback[j];
+            }
+            glBufferSubData(GL_ARRAY_BUFFER, 0, data.size()*sizeof(float), &data[0]);
+
+
 
         // Swap the screen buffers
-        glfwSwapBuffers(window);
     }
+
+    glDeleteProgram(program);
+    glDeleteShader(shaderVert);
+    glDeleteShader(shaderFrag);
+
+    glDeleteBuffers(1, &tbo);
+    glDeleteBuffers(1, &vbo);
+
+    glDeleteVertexArrays(1, &vao);
+
     return 0;
 }
 
